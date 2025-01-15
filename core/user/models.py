@@ -8,7 +8,21 @@ from django.http import Http404
 
 
 class UserManager(BaseUserManager):
+    """
+    Custom manager for User model. This manager provides helper methods
+    to create regular users and superusers.
+    """
     def get_object_by_public_id(self, public_id):
+        """
+        Retrieve a User object by its unique public_id.
+        
+        Args:
+            public_id (UUID): The unique public identifier of the user.
+        
+        Returns:
+            User: The User instance with the specified public_id.
+            Http404: If the User is not found, raises an HTTP 404 error.
+        """
         try:
             instance = self.get(public_id=public_id)
             return instance
@@ -17,8 +31,20 @@ class UserManager(BaseUserManager):
     
     def create_user(self, username, email, password=None, **kwargs):
         """
-        Create and return a User with an email, phone number,
-        username and password.
+        Create and return a regular user with an email, username, 
+        and password.
+        
+        Args:
+            username (str): The username of the user.
+            email (str): The email address of the user.
+            password (str, optional): The password for the user. Defaults to None.
+            **kwargs: Additional fields for user creation.
+        
+        Raises:
+            TypeError: If username, email, or password is None.
+        
+        Returns:
+            User: The created User instance.
         """
         if username is None:
             raise TypeError("User must have a username.")
@@ -40,6 +66,18 @@ class UserManager(BaseUserManager):
     def create_superuser(self, username, email, password=None, **kwargs):
         """
         Create and return a User with superuser permissions.
+        
+        Args:
+            username (str): The username of the superuser.
+            email (str): The email address of the superuser.
+            password (str, optional): The password for the superuser. Defaults to None.
+            **kwargs: Additional fields for user creation.
+        
+        Raises:
+            TypeError: If username, email, or password is None.
+        
+        Returns:
+            User: The created superuser instance.
         """
         if password is None:
             raise TypeError("SuperUsers must have a password")
@@ -56,6 +94,10 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """
+    Custom User model that extends AbstractBaseUser and PermissionsMixin 
+    to allow authentication and authorization functionality, along with custom fields.
+    """
     public_id = models.UUIDField(
         db_index=True,
         unique=True,
@@ -77,9 +119,22 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
     
     def __str__(self):
+        """
+        String representation of the User model. Returns the user's email address.
+        
+        Returns:
+            str: The user's email address.
+        """
         return f"{self.email}"
     
     @property
     def name(self):
+        """
+        Property that returns the user's full name by combining the first name 
+        and last name fields.
+        
+        Returns:
+            str: The user's full name (first name + last name).
+        """
         return f"{self.first_name} {self.last_name}"
 
