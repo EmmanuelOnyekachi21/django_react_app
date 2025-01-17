@@ -2,9 +2,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import viewsets
 from core.user.models import User
 from core.user.serializers import UserSerializer
+from core.abstract.viewsets import AbstractViewSet
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(AbstractViewSet):
     """
     A viewset for managing User objects.
     

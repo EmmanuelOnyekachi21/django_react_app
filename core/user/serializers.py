@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from core.user.models import User
+from core.abstract.serializers import AbstractSerializer
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(AbstractSerializer):
     """
     Serializer for the User model.
 
@@ -11,13 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
     - `created` and `updated`: DateTime fields that are read-only and reflect
         the timestamps when the user was created and last updated.
     """
-    id = serializers.UUIDField(
-        source='public_id',
-        read_only=True,
-        format='hex'
-    )
-    created = serializers.DateTimeField(read_only=True)
-    updated = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = User

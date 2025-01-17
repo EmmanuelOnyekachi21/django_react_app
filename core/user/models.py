@@ -5,30 +5,14 @@ from django.contrib.auth.models import (
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
+from core.abstract.models import AbstractManager, AbstractModel
 
 
-class UserManager(BaseUserManager):
+class UserManager(BaseUserManager, AbstractManager):
     """
     Custom manager for User model. This manager provides helper methods
     to create regular users and superusers.
     """
-    def get_object_by_public_id(self, public_id):
-        """
-        Retrieve a User object by its unique public_id.
-        
-        Args:
-            public_id (UUID): The unique public identifier of the user.
-        
-        Returns:
-            User: The User instance with the specified public_id.
-            Http404: If the User is not found, raises an HTTP 404 error.
-        """
-        try:
-            instance = self.get(public_id=public_id)
-            return instance
-        except (ObjectDoesNotExist, ValueError, TypeError):
-            return Http404
-    
     def create_user(self, username, email, password=None, **kwargs):
         """
         Create and return a regular user with an email, username, 
@@ -93,25 +77,17 @@ class UserManager(BaseUserManager):
 
         return user
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin, AbstractModel):
     """
     Custom User model that extends AbstractBaseUser and PermissionsMixin 
     to allow authentication and authorization functionality, along with custom fields.
     """
-    public_id = models.UUIDField(
-        db_index=True,
-        unique=True,
-        default=uuid.uuid4,
-        editable=False
-    )
     username = models.CharField(max_length=255, unique=True, db_index=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(db_index=True, unique=True)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
     bio = models.CharField(max_length=255, blank=True)
     avatar = models.ImageField(upload_to="img", blank=True)
     
