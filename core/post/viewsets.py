@@ -13,6 +13,7 @@ from core.post.serializers import PostSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from core.auth.permissions import UserPermission
+from rest_framework.decorators import action
 
 
 class PostViewSet(AbstractViewSet):
@@ -35,4 +36,29 @@ class PostViewSet(AbstractViewSet):
         return Response(
             serializer.data,
             status=status.HTTP_201_CREATED
+        )
+
+
+    @action(methods=['post'], detail=True)
+    def like(self, request, *args, **kwargs):
+        post = self.get_object()
+        user = self.request.user
+        
+        user.like(post)
+        serializer = self.serializer_class(post)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+    
+    @action(methods=['post'], detail=True)
+    def remove_like(self, request, *args, **kwargs):
+        post = self.get_object()
+        user = self.request.user
+        
+        user.remove_like(post)
+        serializer = self.serializer_class(post)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
         )
